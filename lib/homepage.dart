@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'google_sheets_api.dart';
+import 'package:qr_code_scanner/qr_code_scanner.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -10,6 +12,25 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
+  Barcode? result;
+  QRViewController? controller;
+
+  // In order to get hot reload to work we need to pause the camera if the platform
+  // is android, or resume the camera if the platform is iOS.
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  void reassemble() {
+    super.reassemble();
+    if (Platform.isAndroid) {
+      controller!.pauseCamera();
+    } else if (Platform.isIOS) {
+      controller!.resumeCamera();
+    }
+  }
   // collect user input
 
   // enter the new transaction into the spreadsheet
@@ -25,16 +46,6 @@ class _HomePageState extends State<HomePage> {
   // new transaction
 
   // wait for the data to be fetched from google sheets
-  bool timerHasStarted = false;
-  void startLoading() {
-    timerHasStarted = true;
-    Timer.periodic(Duration(seconds: 1), (timer) {
-      if (GoogleSheetsApi.loading == false) {
-        setState(() {});
-        timer.cancel();
-      }
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,26 +58,34 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           body: Stack(alignment: Alignment.center, children: [
-            // Expanded(
-            //   flex: 5,
-            //   child: QRView(
-            //     key: qrKey,
-            //     onQRViewCreated: _onQRViewCreated,
-            //     overlay: QrScannerOverlayShape(
-            //         borderWidth: 10,
-            //         borderLength: 20,
-            //         borderRadius: 10,
-            //         cutOutSize: MediaQuery.of(context).size.width * 0.8),
-            //   ),
-            // ),
-            Center(
-              child: ElevatedButton(
-                  onPressed: () {
-                    _enterTransaction();
-                  },
-                  child: Text("jak")),
-            )
+            Expanded(
+              flex: 5,
+              child: QRView(
+                key: qrKey,
+                onQRViewCreated: _onQRViewCreated,
+                overlay: QrScannerOverlayShape(
+                    borderWidth: 10,
+                    borderLength: 20,
+                    borderRadius: 10,
+                    cutOutSize: MediaQuery.of(context).size.width * 0.8),
+              ),
+            ),
           ])),
     );
+  }
+
+  void _onQRViewCreated(QRViewController controller) {
+    this.controller = controller;
+    controller.scannedDataStream.listen((scanData) {
+      setState(() {
+        result = scanData;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    controller?.dispose();
+    super.dispose();
   }
 }
