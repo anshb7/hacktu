@@ -25,9 +25,6 @@ class GoogleSheetsApi {
   static Worksheet? _worksheet;
 
   // some variables to keep track of..
-  static int numberOfTransactions = 0;
-  static List<List<dynamic>> currentTransactions = [];
-  static bool loading = true;
 
   // initialise the spreadsheet!
   Future init() async {
@@ -42,12 +39,7 @@ class GoogleSheetsApi {
   // insert a new transaction
   static Future insert(String name, String amount, bool _isIncome) async {
     if (_worksheet == null) return;
-    numberOfTransactions++;
-    currentTransactions.add([
-      name,
-      amount,
-      _isIncome == true ? 'income' : 'expense',
-    ]);
+
     await _worksheet!.values.appendRow([
       name,
       amount,
