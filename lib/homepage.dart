@@ -62,6 +62,10 @@ class _HomePageState extends State<HomePage> {
                     cutOutSize: MediaQuery.of(context).size.width * 0.8),
               ),
             ),
+            Container(
+                child: (result != null)
+                    ? Text("data: ${result!.code}")
+                    : Text("No information available")),
             ElevatedButton(
                 onPressed: () {
                   markpresent();
