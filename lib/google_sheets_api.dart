@@ -37,13 +37,11 @@ class GoogleSheetsApi {
   // load existing notes from the spreadsheet
 
   // insert a new transaction
-  static Future insert(String name, String amount, bool _isIncome) async {
+  static Future insert(String name) async {
     if (_worksheet == null) return;
 
     await _worksheet!.values.appendRow([
       name,
-      amount,
-      _isIncome == true ? 'income' : 'expense',
     ]);
   }
 

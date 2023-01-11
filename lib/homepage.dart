@@ -34,14 +34,6 @@ class _HomePageState extends State<HomePage> {
   // collect user input
 
   // enter the new transaction into the spreadsheet
-  void _enterTransaction() {
-    GoogleSheetsApi.insert(
-      "goat",
-      "kya baat hai",
-      true,
-    );
-    setState(() {});
-  }
 
   // new transaction
 
@@ -57,7 +49,7 @@ class _HomePageState extends State<HomePage> {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
-          body: Stack(alignment: Alignment.center, children: [
+          body: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
             Expanded(
               flex: 5,
               child: QRView(
@@ -70,6 +62,11 @@ class _HomePageState extends State<HomePage> {
                     cutOutSize: MediaQuery.of(context).size.width * 0.8),
               ),
             ),
+            ElevatedButton(
+                onPressed: () {
+                  markpresent();
+                },
+                child: Text("MARK PRESENT"))
           ])),
     );
   }
@@ -81,6 +78,11 @@ class _HomePageState extends State<HomePage> {
         result = scanData;
       });
     });
+  }
+
+  void markpresent() {
+    GoogleSheetsApi.insert(result!.code.toString());
+    setState(() {});
   }
 
   @override
