@@ -1,4 +1,4 @@
-# expensetracker
+# attendance
 
 A new Flutter project.
 
