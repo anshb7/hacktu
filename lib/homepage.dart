@@ -73,7 +73,7 @@ class _HomePageState extends State<HomePage> {
                     : Text("No information available")),
             ElevatedButton(
                 onPressed: () {
-                  fetchUser();
+                  markpresent();
                 },
                 child: Text("MARK PRESENT"))
           ])),
