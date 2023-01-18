@@ -1,4 +1,5 @@
 import 'package:gsheets/gsheets.dart';
+import 'package:expensetracker/user.dart';
 
 class GoogleSheetsApi {
   // create credentials
@@ -19,32 +20,19 @@ class GoogleSheetsApi {
   }
   ''';
 
-  // set up & connect to the spreadsheet
   static final _spreadsheetId = '1VBhi1fvsPBUZt5O3GmGu2rmD2kNJaeCUZh-hMMoS7ew';
   static final _gsheets = GSheets(_credentials);
   static Worksheet? _worksheet;
 
-  // some variables to keep track of..
-
-  // initialise the spreadsheet!
   Future init() async {
     final ss = await _gsheets.spreadsheet(_spreadsheetId);
     _worksheet = ss.worksheetByTitle('Worksheet1');
   }
 
-  // count the number of notes
-
-  // load existing notes from the spreadsheet
-
-  // insert a new transaction
-  static Future insert(String name) async {
+  static Future insert(User user) async {
     if (_worksheet == null) return;
 
-    await _worksheet!.values.appendRow([
-      name,
-    ]);
+    await _worksheet!.values.appendRow(
+        [user.name, user.email, user.gender, user.phone_no, user.team]);
   }
-
-  // CALCULATE THE TOTAL INCOME!
-
 }

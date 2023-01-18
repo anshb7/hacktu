@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:expensetracker/user.dart';
 import 'package:flutter/material.dart';
 import 'google_sheets_api.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -12,6 +15,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  User user =
+      User(name: "", email: "", gender: "", hostel: "", phone_no: "", team: "");
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   Barcode? result;
   QRViewController? controller;
@@ -68,7 +73,7 @@ class _HomePageState extends State<HomePage> {
                     : Text("No information available")),
             ElevatedButton(
                 onPressed: () {
-                  markpresent();
+                  fetchUser();
                 },
                 child: Text("MARK PRESENT"))
           ])),
@@ -84,8 +89,9 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void markpresent() {
-    GoogleSheetsApi.insert(result!.code.toString());
+  void markpresent() async {
+    fetchUser();
+    GoogleSheetsApi.insert(user);
     setState(() {});
   }
 
@@ -93,5 +99,30 @@ class _HomePageState extends State<HomePage> {
   void dispose() {
     controller?.dispose();
     super.dispose();
+  }
+
+  fetchUser() async {
+    var headers = {
+      "Authorization": "Token 3f3c6554418b57a350b885fc35e0cb253f4c05dd",
+    };
+    final response =
+        await http.get(Uri.parse(result!.code.toString()), headers: headers);
+
+    if (response.statusCode == 200) {
+      // If the server did return a 200 OK response,
+      // then parse the JSON.
+      User userr = User.fromJson(jsonDecode(response.body));
+      user = User(
+          name: userr.name,
+          email: userr.email,
+          gender: userr.gender,
+          hostel: userr.hostel,
+          phone_no: userr.phone_no,
+          team: userr.team);
+    } else {
+      // If the server did not return a 200 OK response,
+      // then throw an exception.
+      throw Exception('Failed to load album');
+    }
   }
 }
